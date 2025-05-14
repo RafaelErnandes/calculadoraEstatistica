@@ -1,6 +1,6 @@
 export const Header = () => {
   return (
-    <header className="bg-blue-600 text-white p-8 flex items-center justify-between shadow-lg ">
+    <header className="bg-blue-600 text-white p-10 flex items-center justify-between shadow-lg absolute w-full">
       <h1 className="text-2xl font-bold">Calculadora de Dados</h1>
 
       <nav>

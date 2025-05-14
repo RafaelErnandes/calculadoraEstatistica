@@ -1,4 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 export const LeftSide = () => {
+  const navigate = useNavigate();
+
+  const handleNextPage = () => {
+    navigate("/calculdora");
+  };
+
   return (
     <div className="w-1/2 p-10 flex flex-col justify-center">
       <h1 className="text-3xl font-bold text-blue-700">
@@ -17,7 +25,10 @@ export const LeftSide = () => {
         <li>📉 Contínuos: Classes com intervalos</li>
       </ul>
 
-      <button className="mt-8 w-fit px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition cursor-pointer">
+      <button
+        className="mt-8 w-fit px-6 py-3 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition cursor-pointer"
+        onClick={handleNextPage}
+      >
         Começar agora
       </button>
 

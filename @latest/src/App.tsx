@@ -7,7 +7,7 @@ export const App = () => {
     <>
       <div className=" h-screen">
         <Header />
-        <div className="flex justify-center">
+        <div className="flex justify-center h-screen">
           <LeftSide />
           <RightSide />
         </div>
