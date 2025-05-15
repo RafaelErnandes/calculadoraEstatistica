@@ -1,7 +1,9 @@
-export type CalculatorFormProps = {
-
-}
+export type CalculatorFormProps = {};
 
 export type CalculatorFormData = {
-    value: number
-}
+  value: number;
+  type: "notGrouped" | "grouped";
+  media?: boolean;
+  moda?: boolean;
+  mediana?: boolean;
+};

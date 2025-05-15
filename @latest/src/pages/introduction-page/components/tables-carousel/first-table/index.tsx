@@ -16,6 +16,7 @@ export const FirstTable = () => {
         maxWidth: 800,
         margin: "0 auto",
       }}
+      className="w-full overflow-x-auto"
     >
       <Table
         size="medium"
