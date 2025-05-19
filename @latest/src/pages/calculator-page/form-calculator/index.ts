@@ -1,9 +1,9 @@
 export type CalculatorFormProps = {};
 
 export type CalculatorFormData = {
-  value: number;
+  value: string;
   type: "notGrouped" | "grouped";
-  media?: boolean;
-  moda?: boolean;
-  mediana?: boolean;
+  average?: boolean;
+  mode?: boolean;
+  median?: boolean;
 };

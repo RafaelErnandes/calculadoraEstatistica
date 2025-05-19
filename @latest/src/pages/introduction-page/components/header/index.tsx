@@ -1,12 +1,25 @@
-export const Header = () => {
+import { HeaderProps } from ".";
+
+export const Header = (props: HeaderProps) => {
+  const { title, navItems, className } = props;
+
   return (
-    <header className="bg-blue-600 text-white p-10 flex items-center justify-between shadow-lg absolute w-full">
-      <h1 className="text-2xl font-bold">Calculadora de Dados</h1>
+    <header
+      className={`bg-blue-600 dark:bg-[#121212] text-white p-10 flex items-center justify-between shadow-lg  w-full ${className}`}
+    >
+      <h1 className="text-2xl font-bold">{title}</h1>
 
       <nav>
-        <ul className="flex  text-sm font-medium gap-6">
-          <li className="hover:underline cursor-pointer">Sobre Nós</li>
-          <li className="hover:underline cursor-pointer">???</li>
+        <ul className="flex text-sm font-medium gap-6 items-center">
+          {navItems.map((item, index) => (
+            <li
+              key={index}
+              className="hover:underline cursor-pointer"
+              onClick={item.onClick}
+            >
+              {item.label}
+            </li>
+          ))}
         </ul>
       </nav>
     </header>

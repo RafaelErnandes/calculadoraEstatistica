@@ -17,13 +17,15 @@ export const RadioButtons = (props: RadioButtonsProps) => {
           value="notGrouped"
           control={<Radio />}
           label="Não Agrupado"
-          {...register("type")}
+          className="dark:text-zinc-100"
+          {...register("type", { required: "Selecione uma opção" })}
         />
         <FormControlLabel
           value="grouped"
           control={<Radio />}
           label="Agrupado"
-          {...register("type")}
+          className="dark:text-zinc-100"
+          {...register("type", { required: "Selecione uma opção" })}
         />
       </RadioGroup>
     </FormControl>

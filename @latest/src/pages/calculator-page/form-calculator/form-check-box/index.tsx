@@ -1,26 +1,37 @@
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { Checkbox, FormControlLabel, FormGroup, useTheme } from "@mui/material";
 
 import { CheckboxButtonsProps } from ".";
 
 export const CheckboxButtons = (props: CheckboxButtonsProps) => {
   const { register } = props;
+  const theme = useTheme();
+
+  const checkboxStyles = {
+    color: theme.palette.mode === "dark" ? "#fff" : "default",
+    "&Mui-checked": {
+      color: theme.palette.mode === "dark" ? "#fff" : undefined,
+    },
+  };
 
   return (
     <FormGroup row>
       <FormControlLabel
-        control={<Checkbox />}
+        control={<Checkbox sx={checkboxStyles} />}
         label="Média"
-        {...register("media")}
+        className="dark:text-zinc-100"
+        {...register("average")}
       />
       <FormControlLabel
-        control={<Checkbox />}
+        control={<Checkbox sx={checkboxStyles} />}
         label="Moda"
-        {...register("moda")}
+        className="dark:text-zinc-100"
+        {...register("mode")}
       />
       <FormControlLabel
-        control={<Checkbox />}
+        control={<Checkbox sx={checkboxStyles} />}
         label="Mediana"
-        {...register("mediana")}
+        className="dark:text-zinc-100"
+        {...register("median")}
       />
     </FormGroup>
   );

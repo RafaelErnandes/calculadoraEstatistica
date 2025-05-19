@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      if (localStorage.getItem("theme-statistic") === "dark") {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
+
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora de Dados</title>
   </head>
-  <body class="bg-gray-100">
+  <body class="bg-gray-100 dark:bg-zinc-800">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

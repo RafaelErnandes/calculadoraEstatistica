@@ -2,6 +2,7 @@ import "./index.css";
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
+import { AboutUs } from "./pages/sobre-nos/index.tsx";
 import { App } from "./App.tsx";
 import { CalculatorPage } from "./pages/calculator-page/index.tsx";
 import { StrictMode } from "react";
@@ -13,8 +14,12 @@ const route = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "/calculdora",
+    path: "/calculadora",
     element: <CalculatorPage />,
+  },
+  {
+    path: "/sobre-nos",
+    element: <AboutUs />,
   },
 ]);
 

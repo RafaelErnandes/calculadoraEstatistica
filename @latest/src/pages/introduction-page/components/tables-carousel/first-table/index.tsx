@@ -16,17 +16,34 @@ export const FirstTable = () => {
         maxWidth: 800,
         margin: "0 auto",
       }}
-      className="w-full overflow-x-auto"
+      className="w-full overflow-x-auto "
     >
       <Table
         size="medium"
         sx={{
           "& td, & th": {
-            paddingLeft: "6px",
-            paddingRight: "6px",
+            paddingLeft: 6,
+            paddingRight: 6,
             whiteSpace: "nowrap",
           },
+          "& thead": {
+            backgroundColor: "#e5e7eb",
+          },
+          "& tbody tr:nth-of-type(odd)": {
+            backgroundColor: "#f9fafb",
+          },
+          ".dark & td, .dark & th": {
+            color: "#F1F5F9",
+          },
+          ".dark & thead": {
+            backgroundColor: "#121212",
+            fontWeight: "bold",
+          },
+          ".dark & tbody tr:nth-of-type(odd)": {
+            backgroundColor: "#1f1f1f",
+          },
         }}
+        className="dark:bg-zinc-800 "
       >
         <TableHead>
           <TableRow>
@@ -80,6 +97,7 @@ export const FirstTable = () => {
             <TableCell align="center">
               <strong>N = 30</strong>
             </TableCell>
+            <TableCell></TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableBody>
