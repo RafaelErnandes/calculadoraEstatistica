@@ -10,7 +10,8 @@ export const CalculatorPage = () => {
         </div>
         <div className="lg:w-1/2">
           <h1 className="text-3xl mb-2 text-blue-700 dark:text-purple-700">
-            Veja o resultado da conta em uma tabela!
+            Utilize a tabela para calcular os
+            <span className="italic font-semibold"> Dados Contínuos</span>
           </h1>
           <span className="text-lg dark:text-zinc-100">
             Confira os dados inseridos com nossa tabela

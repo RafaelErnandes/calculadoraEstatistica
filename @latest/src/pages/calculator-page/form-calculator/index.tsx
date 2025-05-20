@@ -29,7 +29,15 @@ export const FormCalculator = () => {
     if (data.type === "notGrouped") {
       api
         .post("/api/v1/calculadora_estatistica/Median/Calculate/notGrouped", {
-          objetoParaOBack: [data],
+          objetoParaOBack: [
+            {
+              type: data.type,
+              value: numberArray.join(","),
+              average: data.average,
+              mode: data.mode,
+              median: data.median,
+            },
+          ],
         })
         .then((response) => {
           console.log("Resposta da API:", response.data);

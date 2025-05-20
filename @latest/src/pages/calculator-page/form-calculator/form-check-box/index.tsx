@@ -33,6 +33,12 @@ export const CheckboxButtons = (props: CheckboxButtonsProps) => {
         className="dark:text-zinc-100"
         {...register("median")}
       />
+      <FormControlLabel
+        control={<Checkbox sx={checkboxStyles} />}
+        label="Desvio Padrão"
+        className="dark:text-zinc-100"
+        {...register("standardDeviation")}
+      />
     </FormGroup>
   );
 };
