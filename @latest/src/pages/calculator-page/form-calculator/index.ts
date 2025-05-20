@@ -1,7 +1,7 @@
 export type CalculatorFormProps = {};
 
 export type CalculatorFormData = {
-  value: string;
+  listNumber: string;
   type: "notGrouped" | "grouped" | "continuous";
   average?: boolean;
   mode?: boolean;

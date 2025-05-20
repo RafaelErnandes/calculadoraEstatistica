@@ -1,5 +1,6 @@
 import { FormCalculator } from "./form-calculator/index.tsx";
-import { TableCalculator } from "./table-calculator/index.tsx";
+
+// import { TableCalculator } from "./table-calculator/index.tsx";
 
 export const CalculatorPage = () => {
   return (
@@ -17,7 +18,7 @@ export const CalculatorPage = () => {
             Confira os dados inseridos com nossa tabela
           </span>
           <div className="flex justify-center mt-4">
-            <TableCalculator />
+            {/* <TableCalculator /> */}
           </div>
         </div>
       </div>

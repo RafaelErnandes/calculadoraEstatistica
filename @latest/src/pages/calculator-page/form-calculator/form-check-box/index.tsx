@@ -1,15 +1,16 @@
 import { Checkbox, FormControlLabel, FormGroup, useTheme } from "@mui/material";
 
 import { CheckboxButtonsProps } from ".";
+import { pink } from "@mui/material/colors";
 
 export const CheckboxButtons = (props: CheckboxButtonsProps) => {
   const { register } = props;
   const theme = useTheme();
 
   const checkboxStyles = {
-    color: theme.palette.mode === "dark" ? "#fff" : "default",
-    "&Mui-checked": {
-      color: theme.palette.mode === "dark" ? "#fff" : undefined,
+    color: theme.palette.mode === "dark" ? "#fff" : pink[800],
+    "&.Mui-checked": {
+      color: theme.palette.mode === "dark" ? pink[800] : pink[800],
     },
   };
 
