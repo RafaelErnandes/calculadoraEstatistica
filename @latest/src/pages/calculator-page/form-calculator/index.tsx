@@ -45,7 +45,6 @@ export const FormCalculator = () => {
         mode: data.mode,
       })
       .then((resp) => {
-        console.log("OK:", resp.data);
         setResult(resp.data);
       })
       .catch((err) => console.error("Erro:", err));
@@ -97,30 +96,40 @@ export const FormCalculator = () => {
             )}
           </div>
         )}
-        {/* {watch("type") === "continuous" && <TableCalculator />} */}
         <button
           type="submit"
           className="bg-blue-600 dark:bg-purple-600 text-white rounded-md p-3 hover:bg-blue-700 dark:hover:bg-purple-700 transition cursor-pointer"
         >
           Calcular
         </button>
-        {submittedData && (
+        {submittedData ? (
           <div className="mt-4 p-4 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-600 rounded-md">
             <h3 className="font-semibold mb-2 text-gray-700 dark:text-zinc-100">
               Resumo da seleção:
             </h3>
             <ul className="text-gray-600 dark:text-zinc-200 list-disc list-inside space-y-1">
               <li>
-                Tipo:{" "}
+                Tipo:
                 {submittedData.type === "grouped"
-                  ? "Agrupado"
+                  ? " Agrupado"
                   : submittedData.type === "notGrouped"
-                  ? "Não agrupado"
+                  ? " Não agrupado"
                   : "Contínuo"}
               </li>
               {result?.mode && <li>Moda: {result.mode}</li>}
               {result?.average && <li>Média: {result.average}</li>}
               {result?.median && <li>Mediana: {result.median}</li>}
+            </ul>
+          </div>
+        ) : (
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-purple-50 border-1-4 border-blue-400 dark:border-purple-400 rounded shadow-sm">
+            <h2 className="font-semibold text-blue-700 dark:text-purple-700 mb-2">
+              Dicas de interpretação:
+            </h2>
+            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+              <li>A média representa o valor central dos dados.</li>
+              <li>O desvio padrão mostra o quanto os dados variam.</li>
+              <li>Moda é o valor mais frequente - pode haver mais de uma.</li>
             </ul>
           </div>
         )}

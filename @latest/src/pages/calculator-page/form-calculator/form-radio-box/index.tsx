@@ -27,13 +27,6 @@ export const RadioButtons = (props: RadioButtonsProps) => {
           className="dark:text-zinc-100"
           {...register("type", { required: "Selecione uma opção" })}
         />
-        <FormControlLabel
-          value="continuous"
-          control={<Radio />}
-          label="Contínuo"
-          className="dark:text-zinc-100"
-          {...register("type", { required: "Selecione uma opção" })}
-        />
       </RadioGroup>
     </FormControl>
   );
