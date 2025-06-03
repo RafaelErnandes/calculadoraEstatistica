@@ -31,7 +31,7 @@ export const AboutUs = () => {
           </h2>
           <p className="text-gray-700 dark:text-zinc-200">
             React, TypeScript, TailwindCSS, React Router, React Hook Form,
-            Recharts, Context API, LocalStorage, etc.
+            Context API, LocalStorage, etc.
           </p>
         </div>
       </section>
@@ -42,7 +42,7 @@ export const AboutUs = () => {
           <ul className="space-y-3 text-base">
             <li>✅ Cálculo de média, moda e mediana</li>
             <li>✅ Suporte a dados agrupados e não agrupados</li>
-            <li>✅ Gráficos interativos com Recharts</li>
+            <li>✅ Tabelas de dados para melhor entendimento</li>
             <li>✅ Modo escuro/claro com toggle</li>
             <li>✅ Armazenamento de dados com LocalStorage</li>
           </ul>
