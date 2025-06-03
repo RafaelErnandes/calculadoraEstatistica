@@ -7,6 +7,7 @@ import { App } from "./App.tsx";
 import { CalculatorPage } from "./pages/calculator-page/index.tsx";
 import { CalculatorProvider } from "./context/calculator-context/index.tsx";
 import { StrictMode } from "react";
+import { ToastContainer } from "react-toastify";
 import { createRoot } from "react-dom/client";
 
 const route = createBrowserRouter([
@@ -28,6 +29,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <CalculatorProvider>
       <RouterProvider router={route}></RouterProvider>
+      <ToastContainer />
     </CalculatorProvider>
   </StrictMode>
 );
