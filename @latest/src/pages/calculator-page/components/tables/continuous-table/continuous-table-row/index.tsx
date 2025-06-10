@@ -72,6 +72,7 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
       <TableCell align="center">
         <span>{lines[index].xi}</span>
       </TableCell>
+
       <TableCell align="center">
         <Controller
           name={`lines.${index}.fi`}
@@ -96,9 +97,11 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
           )}
         />
       </TableCell>
+
       <TableCell align="center">
         <span>{lines[index].fac}</span>
       </TableCell>
+
       <TableCell align="center">
         <div className="flex items-center justify-center gap-2">
           {isLast && (
@@ -106,8 +109,8 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
               type="button"
               onClick={onAddLine}
               className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 
-      rounded-full p-2 hover:bg-blue-200 dark:hover:bg-blue-800 
-      shadow-sm transition-all cursor-pointer"
+              rounded-full p-2 hover:bg-blue-200 dark:hover:bg-blue-800 
+              shadow-sm transition-all cursor-pointer"
             >
               <Plus size={18} />
             </button>
@@ -117,8 +120,8 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
               type="button"
               onClick={() => onRemoveLine(index)}
               className="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 
-      rounded-full p-2 hover:bg-red-200 dark:hover:bg-red-800 
-      shadow-sm transition-all cursor-pointer"
+              rounded-full p-2 hover:bg-red-200 dark:hover:bg-red-800 
+              shadow-sm transition-all cursor-pointer"
             >
               <Trash2 size={18} />
             </button>

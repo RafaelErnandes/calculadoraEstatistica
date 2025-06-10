@@ -1,3 +1,4 @@
+import { Classe } from "../../../../../../context/calculator-context";
 import { Control } from "react-hook-form";
 
 export type TableCalculatorProps = {
@@ -5,6 +6,18 @@ export type TableCalculatorProps = {
   ls: number;
   fi: number;
 };
+
+export type InputLine = {
+  classe: Classe;
+  fi: number;
+  xi: number;
+  fac: number;
+};
+
+export type InputTable = {
+  lines: InputLine[];
+};
+
 export type Line = TableCalculatorProps & {
   xi: number;
   fac: number;
@@ -25,4 +38,6 @@ export type ContinuousTableRowProps = {
   onFirstLsChange: (value: number) => void;
   onAddLine: () => void;
   onRemoveLine: (index: number) => void;
+  onUpdateXi: (index: number, newXi: number) => void;
+  onUpdateFac: (index: number, newFac: number) => void;
 };

@@ -1,18 +1,18 @@
+import { FormValues, InputTable } from "./continuous-table-row/index.ts";
 import { Paper, Table, TableBody, TableContainer } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { ContinuousTableHeader } from "./continuous-table-header";
 import { ContinuousTableRow } from "./continuous-table-row/index.tsx";
-import { FormSubmitProps } from "./index.ts";
 import { api } from "../../../../../service/calculatorServices";
 import { toast } from "react-toastify";
 import { useCalculator } from "../../../../../context/calculator-context/index.tsx";
-import { useState } from "react";
 
 export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
   const { setResult } = useCalculator();
 
-  const { control, handleSubmit, watch } = useForm({
+  const { control, handleSubmit, watch } = useForm<FormValues>({
     defaultValues: {
       lines: [{ li, ls, fi, xi: 0, fac: 0 }],
     },
@@ -26,7 +26,43 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
   const [firstLi, setFirstLi] = useState<number>(li);
   const [firstLs, setFirstLs] = useState<number>(ls);
 
+  useEffect(() => {
+    if (firstLi != null && firstLs != null && firstLi < firstLs) {
+      api
+        .post("/api/StatisticalCalculator/getXi", {
+          li: firstLi,
+          ls: firstLs,
+        })
+        .then((response) => {
+          const xi = response.data;
+          console.log("xi da api =", xi);
+          update(0, { ...lines[0], xi });
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar xi:", error);
+        });
+    }
+  }, [firstLi, firstLs]);
+
   const lines = watch("lines");
+  useEffect(() => {
+    lines.forEach(async (line, index) => {
+      if (line.fi > 0 && line.fac !== undefined) {
+        try {
+          const response = await api.post("/api/StatisticalCalculator/GetFAC", {
+            fi: line.fi,
+          });
+          const fac = response.data;
+
+          if (fac !== line.fac) {
+            update(index, { ...line, fac });
+          }
+        } catch (error) {
+          console.error(`Erro ao buscar FAC da linha ${index}:`, error);
+        }
+      }
+    });
+  }, [lines, update]);
 
   const updateLinesFromFirst = (newLi: number, newLs: number) => {
     const interval = newLs - newLi;
@@ -51,7 +87,7 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
     updateLinesFromFirst(firstLi, value);
   };
 
-  const handleAddLine = () => {
+  const handleAddLine = async () => {
     const last = lines[lines.length - 1];
     if (last.li >= last.ls || last.fi <= 0) {
       toast.error(
@@ -69,7 +105,24 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
     const newLi = last.ls;
     const newLs = newLi + interval;
 
-    append({ li: newLi, ls: newLs, fi: 0, xi: 0, fac: 0 });
+    try {
+      const responseXi = await api.post("/api/StatisticalCalculator/getXi", {
+        li: newLi,
+        ls: newLs,
+      });
+      const xi = responseXi.data;
+
+      const responseFac = await api.post("/api/StatisticalCalculator/GetFAC", {
+        fi: 0,
+      });
+      const fac = responseFac.data;
+
+      append({ li: newLi, ls: newLs, fi: 0, xi, fac });
+    } catch (error) {
+      console.error("Erro ao buscar xi ou fac:", error);
+      toast.error("Erro ao calcular xi ou fac da nova linha.");
+      append({ li: newLi, ls: newLs, fi: 0, xi: 0, fac: 0 });
+    }
   };
 
   const handleRemoveLine = (index: number) => {
@@ -91,24 +144,46 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
     }
   };
 
-  const onSubmit = async (data: FormSubmitProps) => {
+  const onSubmit = async (data: FormValues) => {
     if (data.lines.length === 0) {
       toast.error("Preencha a primeira linha antes de calcular.");
       return;
     }
 
     try {
-      const firstLine = data.lines[0];
-      const response = await api.post("/api/StatisticalCalculator/Continuous", {
-        li: firstLine.li,
-        ls: firstLine.ls,
-        fi: firstLine.fi,
-      });
+      const inputTable: InputTable = {
+        lines: data.lines.map((line) => ({
+          classe: { li: line.li, ls: line.ls },
+          fi: line.fi,
+          xi: line.xi,
+          fac: line.fac,
+        })),
+      };
+
+      const response = await api.post(
+        "/api/StatisticalCalculator/GetFAC",
+        inputTable
+      );
+
       setResult(response.data);
     } catch (error) {
       console.error(error);
       toast.error("Erro ao calcular, veja o console.");
     }
+  };
+
+  const handleUpdateXi = (index: number, newXi: number) => {
+    update(index, {
+      ...lines[index],
+      xi: newXi,
+    });
+  };
+
+  const handleUpdateFac = (index: number, newFac: number) => {
+    update(index, {
+      ...lines[index],
+      fac: newFac,
+    });
   };
 
   return (
@@ -162,6 +237,8 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
                 onFirstLsChange={handleFirstLsChange}
                 onAddLine={handleAddLine}
                 onRemoveLine={handleRemoveLine}
+                onUpdateXi={handleUpdateXi}
+                onUpdateFac={handleUpdateFac}
               />
             ))}
             <tr>
