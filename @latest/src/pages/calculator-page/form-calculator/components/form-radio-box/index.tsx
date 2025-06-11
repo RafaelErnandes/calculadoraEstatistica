@@ -1,9 +1,4 @@
-import {
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  RadioGroup,
-} from "@mui/material";
+import { FormControlLabel, FormGroup, RadioGroup } from "@mui/material";
 
 import Radio from "@mui/material/Radio";
 import { RadioButtonsProps } from ".";
@@ -51,6 +46,22 @@ export const RadioButtons = (props: RadioButtonsProps) => {
             />
           }
           label="Agrupado"
+          className="dark:text-zinc-100"
+          {...register("type", { required: "Selecione uma opção" })}
+        />
+        <FormControlLabel
+          value="continuous"
+          control={
+            <Radio
+              sx={{
+                color: radioboxColor,
+                "&.Mui-checked": {
+                  color: radioboxColor,
+                },
+              }}
+            />
+          }
+          label="Contínuo"
           className="dark:text-zinc-100"
           {...register("type", { required: "Selecione uma opção" })}
         />

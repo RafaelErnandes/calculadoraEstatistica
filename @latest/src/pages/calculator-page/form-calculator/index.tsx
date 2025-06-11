@@ -1,23 +1,33 @@
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+
 import { CalculatorFormData } from "./index";
 import { CheckboxButtons } from "./components/form-check-box/index.tsx";
+import { ContinuousTable } from "../components/tables/continuous-table/index.tsx";
 import { ErrorMessage } from "../../../components/error-message/index.tsx";
 import { RadioButtons } from "./components/form-radio-box/index.tsx";
 import { ToggleTheme } from "../../../components/toggle-theme/index.tsx";
 import { api } from "../../../service/calculatorServices.ts";
+import { toast } from "react-toastify";
 import { useCalculator } from "../../../context/calculator-context/index.tsx";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
 
 export const FormCalculator = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<CalculatorFormData>();
+
+  const type = useWatch({ name: "type", control });
 
   const [submittedData, setSubmittedData] = useState<CalculatorFormData | null>(
     null
   );
+
+  useEffect(() => {
+    setSubmittedData(null);
+  }, [type]);
 
   const { result, setResult } = useCalculator();
 
@@ -32,6 +42,8 @@ export const FormCalculator = () => {
     const endpoint =
       data.type === "grouped"
         ? "/api/StatisticalCalculator/Grouped"
+        : data.type === "continuous"
+        ? "/api/StatisticalCalculator/ContinuousData"
         : "/api/StatisticalCalculator/NotGrouped";
 
     try {
@@ -47,6 +59,35 @@ export const FormCalculator = () => {
       console.log(data);
     } catch (error) {
       console.error("Erro:", error);
+    }
+  };
+
+  const handleContinuousCalculate = async (lines: any[]) => {
+    const payload = {
+      inputTable: {
+        listInputLineTable: lines.map((line) => ({
+          classe: { li: line.li, ls: line.ls },
+          fi: Number(line.fi),
+          xi: line.xi,
+          fac: line.fac,
+        })),
+      },
+      average: true,
+      median: true,
+      mode: true,
+      standardDeviation: true,
+    };
+
+    try {
+      const response = await api.post(
+        "/api/StatisticalCalculator/ContinuousData",
+        payload
+      );
+      setResult(response.data);
+      setSubmittedData({ type: "continuous" } as CalculatorFormData);
+      toast.success("Cálculo realizado com sucesso!");
+    } catch (error) {
+      toast.error("Erro ao calcular, tente novamente.");
     }
   };
 
@@ -73,35 +114,46 @@ export const FormCalculator = () => {
           <CheckboxButtons register={register} />
         </div>
 
-        <div className="flex flex-col">
-          <input
-            type="text"
-            placeholder="Insira seus valores separados por vírgula"
-            {...register("listNumber", {
-              required: "Campo obrigatório",
-              pattern: {
-                value: /^-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?)*$/,
-                message: "Digite apenas números separados por vírgula",
-              },
-            })}
-            className={`border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 dark:placeholder:text-zinc-100 dark:text-zinc-100 focus:border-none ${
-              errors.listNumber && "border-red-500"
-            }`}
+        {type !== "continuous" && (
+          <div className="flex flex-col">
+            <input
+              type="text"
+              placeholder="Insira seus valores separados por vírgula"
+              {...register("listNumber", {
+                required: "Campo obrigatório",
+                pattern: {
+                  value: /^-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?)*$/,
+                  message: "Digite apenas números separados por vírgula",
+                },
+              })}
+              className={`border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 dark:placeholder:text-zinc-100 dark:text-zinc-100 focus:border-none ${
+                errors.listNumber && "border-red-500"
+              }`}
+            />
+            {errors.listNumber && (
+              <span className="text-red-600 text-sm mt-1">
+                {errors.listNumber.message}
+              </span>
+            )}
+          </div>
+        )}
+
+        {type === "continuous" ? (
+          <ContinuousTable
+            fi={0}
+            li={0}
+            ls={0}
+            onCalculate={handleContinuousCalculate}
           />
+        ) : (
+          <button
+            type="submit"
+            className="bg-blue-600 dark:bg-purple-600 text-white rounded-md p-3 hover:bg-blue-700 dark:hover:bg-purple-700 transition cursor-pointer"
+          >
+            Calcular
+          </button>
+        )}
 
-          {errors.listNumber && (
-            <span className="text-red-600 text-sm mt-1">
-              {errors.listNumber.message}
-            </span>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-600 dark:bg-purple-600 text-white rounded-md p-3 hover:bg-blue-700 dark:hover:bg-purple-700 transition cursor-pointer"
-        >
-          Calcular
-        </button>
         {submittedData ? (
           <div className="mt-4 p-4 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-600 rounded-md">
             <h3 className="font-semibold mb-2 text-gray-700 dark:text-zinc-100">
@@ -110,18 +162,36 @@ export const FormCalculator = () => {
             <ul className="text-gray-600 dark:text-zinc-200 list-disc list-inside space-y-1">
               <li>
                 Tipo:
-                {submittedData.type === "grouped"
-                  ? " Agrupado"
-                  : submittedData.type === "notGrouped"
-                  ? " Não agrupado"
-                  : "Contínuo"}
+                {
+                  {
+                    grouped: " Agrupado",
+                    notGrouped: " Não agrupado",
+                    continuous: " Contínuo",
+                  }[submittedData.type]
+                }
               </li>
-              {result?.mode && <li>Moda: {result.mode}</li>}
-              {result?.average && <li>Média: {result.average}</li>}
-              {result?.median && <li>Mediana: {result.median}</li>}
-              {result?.standardDeviation && (
-                <li>Desvio Padrão: {result.standardDeviation}</li>
+
+              <li>
+                Moda:
+                {result?.mode === null || result?.mode === undefined
+                  ? "Moda amodal"
+                  : result.mode?.toFixed(2)}
+              </li>
+
+              {result?.average !== undefined && (
+                <li>Média: {result.average?.toFixed(2)}</li>
               )}
+
+              {result?.median !== undefined && (
+                <li>Mediana: {result.median?.toFixed(2)}</li>
+              )}
+
+              <li>
+                Desvio Padrão:
+                {result?.standardDeviation === 0
+                  ? "Não possui"
+                  : result?.standardDeviation?.toFixed(2) ?? " N/A"}
+              </li>
             </ul>
           </div>
         ) : (

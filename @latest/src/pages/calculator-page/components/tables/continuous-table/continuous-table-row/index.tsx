@@ -21,14 +21,6 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
   const isFirst = index === 0;
   const isLast = index === lines.length - 1;
 
-  const calcFac = (idx: number) => {
-    let sum = 0;
-    for (let i = 0; i <= idx; i++) {
-      sum += Number(lines[i].fi) || 0;
-    }
-    return sum;
-  };
-
   return (
     <TableRow key={fieldId}>
       <TableCell>
@@ -78,7 +70,7 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
       </TableCell>
 
       <TableCell align="center">
-        <span>{(lines[index].li + lines[index].ls) / 2}</span>
+        <span>{lines[index].xi}</span>
       </TableCell>
 
       <TableCell align="center">
@@ -107,7 +99,7 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
       </TableCell>
 
       <TableCell align="center">
-        <span>{calcFac(index)}</span>
+        <span>{lines[index].fac}</span>
       </TableCell>
 
       <TableCell align="center">

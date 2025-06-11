@@ -1,4 +1,3 @@
-import { ContinuousTable } from "./components/tables/continuous-table/index.tsx";
 import { FormCalculator } from "./form-calculator/index.tsx";
 import { GroupedTableResult } from "./components/tables/grouped-table-result/index.tsx";
 
@@ -11,23 +10,17 @@ export const CalculatorPage = () => {
         </div>
         <div className="lg:w-1/2">
           <h1 className="text-3xl mb-2 text-blue-700 dark:text-purple-700">
-            Utilize a tabela para calcular os
-            <span className="italic font-semibold"> Dados Contínuos</span>
+            Veja a tabela dos
+            <span className="italic font-semibold"> Dados Agrupados</span>
           </h1>
           <span className="text-lg dark:text-zinc-100">
             Confira os dados inseridos com nossa tabela
           </span>
           <div className="flex justify-center mt-4 max-h-[500px] overflow-x-hidden overflow-y-auto">
-            <ContinuousTable li={0} ls={0} fi={0} />
+            <GroupedTableResult />
           </div>
         </div>
       </div>
-      <section className="bg-blue-700 dark:bg-purple-700 p-8">
-        <h2 className="text-2xl font-bold text-white mb-4">
-          Tabela de Dados Agrupados
-        </h2>
-        <GroupedTableResult />
-      </section>
     </>
   );
 };
