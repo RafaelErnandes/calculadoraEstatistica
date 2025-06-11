@@ -38,6 +38,4 @@ export type ContinuousTableRowProps = {
   onFirstLsChange: (value: number) => void;
   onAddLine: () => void;
   onRemoveLine: (index: number) => void;
-  onUpdateXi: (index: number, newXi: number) => void;
-  onUpdateFac: (index: number, newFac: number) => void;
 };

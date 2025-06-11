@@ -172,20 +172,6 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
     }
   };
 
-  const handleUpdateXi = (index: number, newXi: number) => {
-    update(index, {
-      ...lines[index],
-      xi: newXi,
-    });
-  };
-
-  const handleUpdateFac = (index: number, newFac: number) => {
-    update(index, {
-      ...lines[index],
-      fac: newFac,
-    });
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <TableContainer
@@ -237,8 +223,6 @@ export const ContinuousTable = ({ fi = 0, li = 0, ls = 0 }) => {
                 onFirstLsChange={handleFirstLsChange}
                 onAddLine={handleAddLine}
                 onRemoveLine={handleRemoveLine}
-                onUpdateXi={handleUpdateXi}
-                onUpdateFac={handleUpdateFac}
               />
             ))}
             <tr>
