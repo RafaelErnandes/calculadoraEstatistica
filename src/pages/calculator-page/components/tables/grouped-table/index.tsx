@@ -97,7 +97,7 @@ export const GroupedTable = (props: GroupedTableProps) => {
             <TableCell>Xi</TableCell>
             <TableCell>Fi</TableCell>
             <TableCell>Xi * Fi</TableCell>
-            <TableCell>(Xi - Média)²</TableCell>
+            <TableCell>(Xi - x̄)²</TableCell>
             <TableCell>Ações</TableCell>
           </TableRow>
         </TableHead>

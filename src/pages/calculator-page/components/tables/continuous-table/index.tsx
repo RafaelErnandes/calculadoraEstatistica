@@ -1,132 +1,76 @@
-import { FormValues, InputLine } from "./continuous-table-row/index.ts";
-import { Paper, Table, TableBody, TableContainer } from "@mui/material";
-import { useEffect, useState } from "react";
+import { ContinuousTableProps, FormValues, InputLine } from "./index";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import { Plus, Trash2 } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-import { ContinuousTableHeader } from "./continuous-table-header";
-import { ContinuousTableProps } from "./index.ts";
-import { ContinuousTableRow } from "./continuous-table-row/index.tsx";
 import { toast } from "react-toastify";
 
 export const ContinuousTable = (props: ContinuousTableProps) => {
-  const { fi, li, ls, onCalculate } = props;
+  const { onCalculate } = props;
 
-  const { control, watch } = useForm<FormValues>({
-    defaultValues: {
-      lines: [{ fi, xi: 0, fac: 0, classe: { li, ls } }],
-    },
+  const { control, register, watch } = useForm<FormValues>({
+    defaultValues: { lines: [{ li: 0, ls: 0, fi: 0 }] },
   });
 
-  const {
-    fields,
-    append,
-    update: updateField,
-    remove,
-  } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "lines",
   });
 
-  const [firstLi, setFirstLi] = useState<number>(li);
-  const [firstLs, setFirstLs] = useState<number>(ls);
-
-  const lines = watch("lines") as InputLine[];
-
-  useEffect(() => {
-    lines.forEach((line, idx) => {
-      const xi = (line.classe.li + line.classe.ls) / 2;
-      const fac = lines
-        .slice(0, idx + 1)
-        .reduce((sum, l) => sum + Number(l.fi || 0), 0);
-
-      if (line.xi !== xi || line.fac !== fac) {
-        updateField(idx, { ...line, xi, fac });
-      }
-    });
-  }, [
-    lines.map((line) => line.fi).join(","),
-    lines.map((line) => `${line.classe.li},${line.classe.ls}`).join(","),
-    updateField,
-  ]);
-
-  const updateLinesFromFirst = (newLi: number, newLs: number) => {
-    const interval = newLs - newLi;
-    if (interval <= 0) return;
-
-    updateField(0, { ...lines[0], classe: { li: newLi, ls: newLs } });
-
-    for (let i = 1; i < fields.length; i++) {
-      const updatedLi = newLi + i * interval;
-      const updatedLs = updatedLi + interval;
-      updateField(i, { ...lines[i], classe: { li: updatedLi, ls: updatedLs } });
-    }
-  };
-
-  const handleFirstLiChange = (value: number) => {
-    setFirstLi(value);
-    updateLinesFromFirst(value, firstLs);
-  };
-
-  const handleFirstLsChange = (value: number) => {
-    setFirstLs(value);
-    updateLinesFromFirst(firstLi, value);
-  };
+  const watchedLines = watch("lines");
 
   const handleAddLine = () => {
-    const last = lines[lines.length - 1];
-    if (last.classe.li >= last.classe.ls || last.fi <= 0) {
+    const last = watchedLines[watchedLines.length - 1];
+    if (
+      last?.li === undefined ||
+      last?.ls === undefined ||
+      last?.fi === undefined
+    ) {
       toast.error(
         "Preencha corretamente a última linha antes de adicionar outra."
       );
       return;
     }
 
-    const interval = firstLs - firstLi;
-    if (interval <= 0) {
-      alert("Intervalo inválido na primeira linha.");
-      return;
-    }
-
-    const newLi = last.classe.ls;
-    const newLs = newLi + interval;
-
-    append({ classe: { li: newLi, ls: newLs }, fi: 0, xi: 0, fac: 0 });
-  };
-
-  const handleRemoveLine = (index: number) => {
-    remove(index);
-
-    const interval = firstLs - firstLi;
-    if (interval <= 0) return;
-
-    const currentLines = watch("lines");
-
-    for (let i = index; i < currentLines.length; i++) {
-      const previous =
-        i === 0
-          ? { classe: { li: firstLi, ls: firstLs } }
-          : currentLines[i - 1];
-
-      const newLi = previous.classe.ls;
-      const newLs = newLi + interval;
-
-      updateField(i, { ...currentLines[i], classe: { li: newLi, ls: newLs } });
-    }
+    append({ li: 0, ls: 0, fi: 0 });
   };
 
   const handleCalculateClick = () => {
-    onCalculate(lines);
+    const hasInvalid = watchedLines.some(
+      (line) => isNaN(line.li) || isNaN(line.ls) || isNaN(line.fi)
+    );
+    if (hasInvalid) {
+      toast.error("Todos os campos devem ser preenchidos corretamente.");
+      return;
+    }
+
+    let fac = 0;
+    const formatted: InputLine[] = watchedLines.map((line) => {
+      const xi = (line.li + line.ls) / 2;
+      fac += line.fi;
+      return {
+        classe: { li: line.li, ls: line.ls },
+        fi: line.fi,
+        xi,
+        fac,
+      };
+    });
+
+    onCalculate(formatted);
   };
 
+  let facAcumulado = 0;
+
   return (
-    <TableContainer
-      component={Paper}
-      sx={{
-        margin: "0 auto",
-        maxHeight: fields.length > 3 ? 300 : "none",
-        overflowY: fields.length > 3 ? "auto" : "visible",
-      }}
-    >
+    <TableContainer component={Paper}>
       <Table
         size="medium"
         sx={{
@@ -157,34 +101,92 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
         }}
         className="dark:bg-zinc-800"
       >
-        <ContinuousTableHeader />
+        <TableHead>
+          <TableRow>
+            <TableCell>Li</TableCell>
+            <TableCell>Ls</TableCell>
+            <TableCell>Xi</TableCell>
+            <TableCell>Fi</TableCell>
+            <TableCell>Fac</TableCell>
+            <TableCell>Ações</TableCell>
+          </TableRow>
+        </TableHead>
         <TableBody>
-          {fields.map((field, index) => (
-            <ContinuousTableRow
-              key={field.id}
-              fieldId={field.id}
-              index={index}
-              firstLi={firstLi}
-              firstLs={firstLs}
-              lines={lines}
-              control={control}
-              onFirstLiChange={handleFirstLiChange}
-              onFirstLsChange={handleFirstLsChange}
-              onAddLine={handleAddLine}
-              onRemoveLine={handleRemoveLine}
-            />
-          ))}
-          <tr>
-            <td colSpan={6} className="p-4 border-b border-gray-200">
+          {fields.map((field, index) => {
+            const li = Number(watchedLines[index]?.li ?? 0);
+            const ls = Number(watchedLines[index]?.ls ?? 0);
+            const fi = Number(watchedLines[index]?.fi ?? 0);
+            const xi = (li + ls) / 2;
+
+            facAcumulado += fi;
+
+            return (
+              <TableRow key={field.id}>
+                <TableCell>
+                  <input
+                    type="number"
+                    className="border-b text-center w-20"
+                    {...register(`lines.${index}.li`, { valueAsNumber: true })}
+                  />
+                </TableCell>
+                <TableCell>
+                  <input
+                    type="number"
+                    className="border-b text-center w-20"
+                    {...register(`lines.${index}.ls`, { valueAsNumber: true })}
+                  />
+                </TableCell>
+                <TableCell>{!isNaN(xi) ? xi.toFixed(2) : "-"}</TableCell>
+                <TableCell>
+                  <input
+                    type="number"
+                    className="border-b text-center w-20"
+                    {...register(`lines.${index}.fi`, { valueAsNumber: true })}
+                  />
+                </TableCell>
+                <TableCell>
+                  {!isNaN(facAcumulado) ? facAcumulado : "-"}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {index === fields.length - 1 && (
+                      <button
+                        type="button"
+                        onClick={handleAddLine}
+                        className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 
+                          rounded-full p-2 hover:bg-blue-200 dark:hover:bg-blue-800 
+                          shadow-sm transition-all cursor-pointer"
+                      >
+                        <Plus size={18} />
+                      </button>
+                    )}
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 
+                          rounded-full p-2 hover:bg-red-200 dark:hover:bg-red-800 
+                          shadow-sm transition-all cursor-pointer"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+          <TableRow>
+            <TableCell colSpan={6}>
               <button
                 type="button"
                 onClick={handleCalculateClick}
-                className="bg-blue-600 dark:bg-purple-600 text-white w-full rounded-md p-2 hover:bg-blue-700 dark:hover:bg-purple-700 transition cursor-pointer"
+                className="bg-blue-600 dark:bg-purple-600 text-white rounded-md px-4 py-2 hover:bg-blue-700 dark:hover:bg-purple-700 w-full transition cursor-pointer"
               >
                 Calcular
               </button>
-            </td>
-          </tr>
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>

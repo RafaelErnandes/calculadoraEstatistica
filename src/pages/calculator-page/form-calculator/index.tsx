@@ -10,7 +10,7 @@ import { ErrorMessage } from "../../../components/error-message/index.tsx";
 import { GroupedTable } from "../components/tables/grouped-table/index.tsx";
 import { HandleContinuousSubmit } from "./submissions/handle-continuous-submit/index.ts";
 import { HandleNotGroupedSubmit } from "./submissions/handle-not-grouped-submit/index.ts";
-import { InputLine } from "../components/tables/continuous-table/continuous-table-row/index.ts";
+import { InputLine } from "../components/tables/continuous-table/index.ts";
 import { RadioButtons } from "./components/form-radio-box/index.tsx";
 import { ToggleTheme } from "../../../components/toggle-theme/index.tsx";
 import { handleGroupedSubmit } from "./submissions/handle-grouped-submit/index.ts";
@@ -89,14 +89,14 @@ export const FormCalculator = (props: FormCalculatorProps) => {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8 flex flex-col items-center">
-      <h1 className="text-4xl flex flex-row gap-3 font-bold text-blue-700 dark:text-zinc-100 mb-8">
+      <h1 className="text-4xl flex flex-row gap-3 font-bold text-blue-700 dark:text-purple-500 mb-8">
         Calculadora de Estatística 📊
         <ToggleTheme />
       </h1>
 
       <div className="w-full grid md:grid-cols-2 gap-4 mb-8">
         <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow space-y-4">
-          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b-1 dark:border-zinc-600 pb-2">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-purple-500 border-b-1 dark:border-zinc-600 pb-2">
             <Database />
             Tipo de dados
           </h2>
@@ -105,7 +105,7 @@ export const FormCalculator = (props: FormCalculatorProps) => {
         </div>
 
         <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow space-y-4">
-          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b-1 dark:border-zinc-600 pb-2">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-purple-500 border-b-1 dark:border-zinc-600 pb-2">
             <ChartBar />
             Estatísticas
           </h2>
@@ -115,7 +115,7 @@ export const FormCalculator = (props: FormCalculatorProps) => {
 
       <div className="w-full mb-8 bg-white dark:bg-zinc-800 rounded-lg shadow">
         <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg">
-          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b-1 dark:border-zinc-600 pb-2">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-purple-500 border-b-1 dark:border-zinc-600 pb-2">
             <Grid2X2Check />
             Dados
           </h2>
@@ -177,7 +177,7 @@ export const FormCalculator = (props: FormCalculatorProps) => {
       </div>
       <div className="w-full mb-8 bg-white dark:bg-zinc-800 rounded-lg shadow">
         <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg">
-          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b dark:border-zinc-600 pb-2">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-purple-500 border-b dark:border-zinc-600 pb-2">
             <ChartLine />
             Resultados
           </h2>
@@ -187,11 +187,11 @@ export const FormCalculator = (props: FormCalculatorProps) => {
           {submittedData && (
             <>
               <div className="grid grid-cols-4 gap-4">
-                <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
                   <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
                     Moda
                   </p>
-                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
                     {!selectedStats.mode
                       ? "N/A"
                       : result?.mode === null || result?.mode === undefined
@@ -201,11 +201,11 @@ export const FormCalculator = (props: FormCalculatorProps) => {
                 </div>
 
                 {result?.average !== undefined && (
-                  <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                  <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
                     <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
                       Média
                     </p>
-                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
                       {!selectedStats.average
                         ? "N/A"
                         : result.average.toFixed(2)}
@@ -214,11 +214,11 @@ export const FormCalculator = (props: FormCalculatorProps) => {
                 )}
 
                 {result?.median !== undefined && (
-                  <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                  <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
                     <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
                       Mediana
                     </p>
-                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
                       {!selectedStats.median
                         ? "N/A"
                         : result.median?.toFixed(2)}
@@ -226,11 +226,11 @@ export const FormCalculator = (props: FormCalculatorProps) => {
                   </div>
                 )}
 
-                <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-zinc-300">
                     Desvio Padrão
                   </p>
-                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
                     {!selectedStats.standardDeviation
                       ? "N/A"
                       : result?.standardDeviation === 0
