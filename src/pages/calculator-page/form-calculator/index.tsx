@@ -187,6 +187,19 @@ export const FormCalculator = (props: FormCalculatorProps) => {
           {submittedData && (
             <>
               <div className="grid grid-cols-4 gap-4">
+                {/* Média */}
+                <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                  <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
+                    Média
+                  </p>
+                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
+                    {!selectedStats.average || result?.average == null
+                      ? "N/A"
+                      : result.average.toFixed(2)}
+                  </p>
+                </div>
+
+                {/* Moda */}
                 <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
                   <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
                     Moda
@@ -200,45 +213,34 @@ export const FormCalculator = (props: FormCalculatorProps) => {
                   </p>
                 </div>
 
-                {result?.average !== undefined && (
-                  <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
-                    <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
-                      Média
-                    </p>
-                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
-                      {!selectedStats.average
-                        ? "N/A"
-                        : result.average.toFixed(2)}
-                    </p>
-                  </div>
-                )}
+                {/* Mediana */}
+                <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                  <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
+                    Mediana
+                  </p>
+                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
+                    {!selectedStats.median || result?.median == null
+                      ? "N/A"
+                      : result.median.toFixed(2)}
+                  </p>
+                </div>
 
-                {result?.median !== undefined && (
-                  <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
-                    <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
-                      Mediana
-                    </p>
-                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
-                      {!selectedStats.median
-                        ? "N/A"
-                        : result.median?.toFixed(2)}
-                    </p>
-                  </div>
-                )}
-
+                {/* Desvio Padrão */}
                 <div className="border-t-4 border-blue-700 dark:border-purple-500 bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-zinc-300">
                     Desvio Padrão
                   </p>
                   <p className="text-lg font-semibold text-blue-700 dark:text-purple-500">
-                    {!selectedStats.standardDeviation
+                    {!selectedStats.standardDeviation ||
+                    result?.standardDeviation == null
                       ? "N/A"
-                      : result?.standardDeviation === 0
+                      : result.standardDeviation === 0
                       ? "Não possui"
-                      : result?.standardDeviation?.toFixed(2)}
+                      : result.standardDeviation.toFixed(2)}
                   </p>
                 </div>
               </div>
+
               <div className="w-full">
                 <ContinuousTableResult />
               </div>
