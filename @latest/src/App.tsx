@@ -10,7 +10,7 @@ export const App = () => {
   return (
     <>
       <Header
-        title="Calculadora de Dados"
+        title="Calculadora de Estatística"
         navItems={[
           { label: "Sobre Nós", onClick: () => navigate("/sobre-nos") },
           { label: <ToggleTheme /> },

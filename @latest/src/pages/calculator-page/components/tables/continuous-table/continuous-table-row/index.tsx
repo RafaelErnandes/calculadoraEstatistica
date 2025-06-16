@@ -52,7 +52,7 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
                   display: "inline-block",
                 }}
               >
-                {lines[index].li}
+                {lines[index].classe.li}
               </span>
               -
               <span
@@ -62,7 +62,7 @@ export const ContinuousTableRow = (props: ContinuousTableRowProps) => {
                   display: "inline-block",
                 }}
               >
-                {lines[index].ls}
+                {lines[index].classe.ls}
               </span>
             </>
           )}

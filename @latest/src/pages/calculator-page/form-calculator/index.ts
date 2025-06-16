@@ -1,5 +1,3 @@
-export type CalculatorFormProps = {};
-
 export type CalculatorFormData = {
   listNumber: string;
   type: "notGrouped" | "grouped" | "continuous";
@@ -7,4 +5,8 @@ export type CalculatorFormData = {
   mode?: boolean;
   median?: boolean;
   standardDeviation?: boolean;
+};
+
+export type FormCalculatorProps = {
+  onSubmitSuccess?: () => void;
 };

@@ -24,7 +24,7 @@ export type Line = TableCalculatorProps & {
 };
 
 export type FormValues = {
-  lines: Line[];
+  lines: InputLine[];
 };
 
 export type ContinuousTableRowProps = {
@@ -32,7 +32,7 @@ export type ContinuousTableRowProps = {
   fieldId: string;
   firstLi: number;
   firstLs: number;
-  lines: Line[];
+  lines: InputLine[];
   control: Control<FormValues>;
   onFirstLiChange: (value: number) => void;
   onFirstLsChange: (value: number) => void;

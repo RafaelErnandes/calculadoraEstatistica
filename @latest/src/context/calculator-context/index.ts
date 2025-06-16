@@ -9,16 +9,16 @@ export type LineTable = {
   xi: number;
   fac: number;
   xiMultiplyFi: number;
+  squareXiMinusAverageMultiplyFi: number;
   moduleXiMinusAverageMultiplyFi: number;
-  moduleSquareXisMinusAverageMultiplyFi: number;
 };
 
 export type Table = {
   listLineTable: LineTable[];
-  totalFac: number;
+  totalFAC: number;
   totalXi: number;
   totalXiMultiplyFi: number;
-  totalModuleXiMinusAverageMultiplFi: number;
+  totalSquareXiMinusAverageMultiplyFi: number;
   totalModuleSquareXiMinusAverageMultiplFi: number;
   at: number;
   c: number;

@@ -21,7 +21,7 @@ export const ToggleTheme = () => {
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <div
-            className="bg-gray-100 p-2 rounded-sm dark:bg-[#2A2A2A] flex items-center cursor-pointer"
+            className="bg-zinc-200 p-2 rounded-sm dark:bg-[#2A2A2A] flex items-center cursor-pointer"
             onClick={toggleTheme}
           >
             <button type="button" className="cursor-pointer">

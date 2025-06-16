@@ -1,3 +1,4 @@
+import { FormValues, InputLine } from "./continuous-table-row/index.ts";
 import { Paper, Table, TableBody, TableContainer } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -5,15 +6,14 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { ContinuousTableHeader } from "./continuous-table-header";
 import { ContinuousTableProps } from "./index.ts";
 import { ContinuousTableRow } from "./continuous-table-row/index.tsx";
-import { FormValues } from "./continuous-table-row/index.ts";
 import { toast } from "react-toastify";
 
 export const ContinuousTable = (props: ContinuousTableProps) => {
-  const { fi = 0, li = 0, ls = 0, onCalculate } = props;
+  const { fi, li, ls, onCalculate } = props;
 
   const { control, watch } = useForm<FormValues>({
     defaultValues: {
-      lines: [{ li, ls, fi, xi: 0, fac: 0 }],
+      lines: [{ fi, xi: 0, fac: 0, classe: { li, ls } }],
     },
   });
 
@@ -30,11 +30,11 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
   const [firstLi, setFirstLi] = useState<number>(li);
   const [firstLs, setFirstLs] = useState<number>(ls);
 
-  const lines = watch("lines");
+  const lines = watch("lines") as InputLine[];
 
   useEffect(() => {
     lines.forEach((line, idx) => {
-      const xi = (line.li + line.ls) / 2;
+      const xi = (line.classe.li + line.classe.ls) / 2;
       const fac = lines
         .slice(0, idx + 1)
         .reduce((sum, l) => sum + Number(l.fi || 0), 0);
@@ -45,7 +45,7 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
     });
   }, [
     lines.map((line) => line.fi).join(","),
-    lines.map((line) => `${line.li},${line.ls}`).join(","),
+    lines.map((line) => `${line.classe.li},${line.classe.ls}`).join(","),
     updateField,
   ]);
 
@@ -53,12 +53,12 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
     const interval = newLs - newLi;
     if (interval <= 0) return;
 
-    updateField(0, { ...lines[0], li: newLi, ls: newLs });
+    updateField(0, { ...lines[0], classe: { li: newLi, ls: newLs } });
 
     for (let i = 1; i < fields.length; i++) {
       const updatedLi = newLi + i * interval;
       const updatedLs = updatedLi + interval;
-      updateField(i, { ...lines[i], li: updatedLi, ls: updatedLs });
+      updateField(i, { ...lines[i], classe: { li: updatedLi, ls: updatedLs } });
     }
   };
 
@@ -74,7 +74,7 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
 
   const handleAddLine = () => {
     const last = lines[lines.length - 1];
-    if (last.li >= last.ls || last.fi <= 0) {
+    if (last.classe.li >= last.classe.ls || last.fi <= 0) {
       toast.error(
         "Preencha corretamente a última linha antes de adicionar outra."
       );
@@ -87,10 +87,10 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
       return;
     }
 
-    const newLi = last.ls;
+    const newLi = last.classe.ls;
     const newLs = newLi + interval;
 
-    append({ li: newLi, ls: newLs, fi: 0, xi: 0, fac: 0 });
+    append({ classe: { li: newLi, ls: newLs }, fi: 0, xi: 0, fac: 0 });
   };
 
   const handleRemoveLine = (index: number) => {
@@ -103,12 +103,14 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
 
     for (let i = index; i < currentLines.length; i++) {
       const previous =
-        i === 0 ? { li: firstLi, ls: firstLs } : currentLines[i - 1];
+        i === 0
+          ? { classe: { li: firstLi, ls: firstLs } }
+          : currentLines[i - 1];
 
-      const newLi = previous.ls;
+      const newLi = previous.classe.ls;
       const newLs = newLi + interval;
 
-      updateField(i, { ...currentLines[i], li: newLi, ls: newLs });
+      updateField(i, { ...currentLines[i], classe: { li: newLi, ls: newLs } });
     }
   };
 
@@ -120,9 +122,9 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
     <TableContainer
       component={Paper}
       sx={{
-        maxWidth: "700px",
         margin: "0 auto",
-        overflowX: "hidden",
+        maxHeight: fields.length > 3 ? 300 : "none",
+        overflowY: fields.length > 3 ? "auto" : "visible",
       }}
     >
       <Table
@@ -134,7 +136,10 @@ export const ContinuousTable = (props: ContinuousTableProps) => {
             whiteSpace: "nowrap",
           },
           "& thead": {
-            backgroundColor: "#fff",
+            backgroundColor: "#2563EB",
+          },
+          "& thead th": {
+            color: "#fff",
           },
           "& tbody tr:nth-of-type(odd)": {
             backgroundColor: "#f9fafb",

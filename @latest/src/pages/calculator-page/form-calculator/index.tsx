@@ -1,25 +1,45 @@
+import { CalculatorFormData, FormCalculatorProps } from "./index.ts";
+import { ChartBar, ChartLine, Database, Grid2X2Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
-import { CalculatorFormData } from "./index";
 import { CheckboxButtons } from "./components/form-check-box/index.tsx";
 import { ContinuousTable } from "../components/tables/continuous-table/index.tsx";
+import { ContinuousTableResult } from "../components/tables/continuous-table-result/index.tsx";
 import { ErrorMessage } from "../../../components/error-message/index.tsx";
+import { GroupedTable } from "../components/tables/grouped-table/index.tsx";
+import { HandleContinuousSubmit } from "./submissions/handle-continuous-submit/index.ts";
+import { HandleNotGroupedSubmit } from "./submissions/handle-not-grouped-submit/index.ts";
+import { InputLine } from "../components/tables/continuous-table/continuous-table-row/index.ts";
 import { RadioButtons } from "./components/form-radio-box/index.tsx";
 import { ToggleTheme } from "../../../components/toggle-theme/index.tsx";
-import { api } from "../../../service/calculatorServices.ts";
-import { toast } from "react-toastify";
+import { handleGroupedSubmit } from "./submissions/handle-grouped-submit/index.ts";
 import { useCalculator } from "../../../context/calculator-context/index.tsx";
 
-export const FormCalculator = () => {
+export const FormCalculator = (props: FormCalculatorProps) => {
+  const { onSubmitSuccess } = props;
+
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
     control,
   } = useForm<CalculatorFormData>();
 
   const type = useWatch({ name: "type", control });
+
+  const watchAverage = watch("average");
+  const watchMedian = watch("median");
+  const watchMode = watch("mode");
+  const watchStandardDeviation = watch("standardDeviation");
+
+  const selectedStats = {
+    average: !!watchAverage,
+    median: !!watchMedian,
+    mode: !!watchMode,
+    standardDeviation: !!watchStandardDeviation,
+  };
 
   const [submittedData, setSubmittedData] = useState<CalculatorFormData | null>(
     null
@@ -31,182 +51,201 @@ export const FormCalculator = () => {
 
   const { result, setResult } = useCalculator();
 
-  const handleFormSubmit = async (data: CalculatorFormData) => {
-    setSubmittedData(data);
+  const handleContinuousCalculate = async (lines: InputLine[]) => {
+    await HandleContinuousSubmit({
+      lines,
+      setResult,
+      setSubmittedData,
+      selectedStats,
+    });
+  };
 
-    const numberArray = data.listNumber
-      .split(",")
-      .map((v) => parseFloat(v.trim()))
-      .filter((n) => !isNaN(n));
+  const handleGroupedCalculate = async (
+    lines: { xi: number; fi: number }[]
+  ) => {
+    await handleGroupedSubmit({
+      lines,
+      setResult,
+      setSubmittedData,
+      selectedStats,
+    });
+  };
 
-    const endpoint =
-      data.type === "grouped"
-        ? "/api/StatisticalCalculator/Grouped"
-        : data.type === "continuous"
-        ? "/api/StatisticalCalculator/ContinuousData"
-        : "/api/StatisticalCalculator/NotGrouped";
-
-    try {
-      const resp = await api.post(endpoint, {
-        listNumber: numberArray,
+  const handleNotGroupedCalculate = async (data: CalculatorFormData) => {
+    if (data.type === "notGrouped") {
+      await HandleNotGroupedSubmit({
+        listNumber: data.listNumber,
         average: data.average,
         median: data.median,
         mode: data.mode,
         standardDeviation: data.standardDeviation,
+        setResult,
+        setSubmittedData,
       });
-
-      setResult(resp.data);
-      console.log(data);
-    } catch (error) {
-      console.error("Erro:", error);
     }
-  };
 
-  const handleContinuousCalculate = async (lines: any[]) => {
-    const payload = {
-      inputTable: {
-        listInputLineTable: lines.map((line) => ({
-          classe: { li: line.li, ls: line.ls },
-          fi: Number(line.fi),
-          xi: line.xi,
-          fac: line.fac,
-        })),
-      },
-      average: true,
-      median: true,
-      mode: true,
-      standardDeviation: true,
-    };
-
-    try {
-      const response = await api.post(
-        "/api/StatisticalCalculator/ContinuousData",
-        payload
-      );
-      setResult(response.data);
-      setSubmittedData({ type: "continuous" } as CalculatorFormData);
-      toast.success("Cálculo realizado com sucesso!");
-    } catch (error) {
-      toast.error("Erro ao calcular, tente novamente.");
-    }
+    onSubmitSuccess?.();
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-center mb-6 gap-4">
-        <h1 className="text-3xl font-bold text-center  dark:text-zinc-100">
-          Calculadora de Dados
-        </h1>
+    <div className="w-full max-w-7xl mx-auto px-4 py-8 flex flex-col items-center">
+      <h1 className="text-4xl flex flex-row gap-3 font-bold text-blue-700 dark:text-zinc-100 mb-8">
+        Calculadora de Estatística 📊
         <ToggleTheme />
-      </div>
+      </h1>
 
-      <form
-        onSubmit={handleSubmit(handleFormSubmit)}
-        className="flex flex-col gap-6"
-      >
-        <div className="flex flex-col justify-center items-center">
-          <div className="flex justify-center">
-            <RadioButtons register={register} />
-          </div>
+      <div className="w-full grid md:grid-cols-2 gap-4 mb-8">
+        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow space-y-4">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b-1 dark:border-zinc-600 pb-2">
+            <Database />
+            Tipo de dados
+          </h2>
+          <RadioButtons register={register} watch={watch} />
           {errors.type && <ErrorMessage>Selecione uma opção</ErrorMessage>}
         </div>
-        <div className="flex gap-6 justify-center">
-          <CheckboxButtons register={register} />
-        </div>
 
-        {type !== "continuous" && (
-          <div className="flex flex-col">
-            <input
-              type="text"
-              placeholder="Insira seus valores separados por vírgula"
-              {...register("listNumber", {
-                required: "Campo obrigatório",
-                pattern: {
-                  value: /^-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?)*$/,
-                  message: "Digite apenas números separados por vírgula",
-                },
-              })}
-              className={`border rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 dark:placeholder:text-zinc-100 dark:text-zinc-100 focus:border-none ${
-                errors.listNumber && "border-red-500"
-              }`}
-            />
-            {errors.listNumber && (
-              <span className="text-red-600 text-sm mt-1">
-                {errors.listNumber.message}
-              </span>
+        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 shadow space-y-4">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b-1 dark:border-zinc-600 pb-2">
+            <ChartBar />
+            Estatísticas
+          </h2>
+          <CheckboxButtons register={register} watch={watch} />
+        </div>
+      </div>
+
+      <div className="w-full mb-8 bg-white dark:bg-zinc-800 rounded-lg shadow">
+        <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b-1 dark:border-zinc-600 pb-2">
+            <Grid2X2Check />
+            Dados
+          </h2>
+        </div>
+        <form
+          onSubmit={handleSubmit(handleNotGroupedCalculate)}
+          className="w-full p-2 mb-4 "
+        >
+          <div className="lg:col-span-2 space-y-4 w-full flex flex-col">
+            {type !== "continuous" && type !== "grouped" ? (
+              <div className="flex flex-col p-4 w-full">
+                <input
+                  type="text"
+                  placeholder="Insira seus valores separados por vírgula"
+                  {...register("listNumber", {
+                    required: "Campo obrigatório",
+                    pattern: {
+                      value: /^-?\d+(\.\d+)?(,\s*-?\d+(\.\d+)?)*$/,
+                      message: "Digite apenas números separados por vírgula",
+                    },
+                  })}
+                  className={`border mb-4 w-full rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 dark:placeholder:text-zinc-100 dark:text-zinc-100 focus:border-none ${
+                    errors.listNumber && "border-red-500"
+                  }`}
+                />
+                {errors.listNumber && (
+                  <span className="text-red-600 text-sm mt-1">
+                    {errors.listNumber.message}
+                  </span>
+                )}
+                <button
+                  type="submit"
+                  className="bg-blue-600 dark:bg-purple-600 text-white w-full rounded-md p-2 hover:bg-blue-700 dark:hover:bg-purple-700 transition cursor-pointer"
+                >
+                  Calcular
+                </button>
+              </div>
+            ) : type === "continuous" ? (
+              <div className="w-full">
+                <ContinuousTable
+                  fi={0}
+                  li={0}
+                  ls={0}
+                  onCalculate={handleContinuousCalculate}
+                />
+              </div>
+            ) : (
+              <div className="w-full">
+                <GroupedTable
+                  lines={[{ xi: 0, fi: 0 }]}
+                  average={0}
+                  onCalculate={handleGroupedCalculate}
+                  index={1}
+                />
+              </div>
             )}
           </div>
-        )}
+        </form>
+      </div>
+      <div className="w-full mb-8 bg-white dark:bg-zinc-800 rounded-lg shadow">
+        <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg">
+          <h2 className="text-xl flex gap-2 items-center font-semibold text-blue-700 dark:text-zinc-100 border-b dark:border-zinc-600 pb-2">
+            <ChartLine />
+            Resultados
+          </h2>
+        </div>
 
-        {type === "continuous" ? (
-          <ContinuousTable
-            fi={0}
-            li={0}
-            ls={0}
-            onCalculate={handleContinuousCalculate}
-          />
-        ) : (
-          <button
-            type="submit"
-            className="bg-blue-600 dark:bg-purple-600 text-white rounded-md p-3 hover:bg-blue-700 dark:hover:bg-purple-700 transition cursor-pointer"
-          >
-            Calcular
-          </button>
-        )}
+        <div className="p-4 space-y-4">
+          {submittedData && (
+            <>
+              <div className="grid grid-cols-4 gap-4">
+                <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                  <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
+                    Moda
+                  </p>
+                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                    {!selectedStats.mode
+                      ? "N/A"
+                      : result?.mode === null || result?.mode === undefined
+                      ? "Moda amodal"
+                      : result.mode}
+                  </p>
+                </div>
 
-        {submittedData ? (
-          <div className="mt-4 p-4 bg-gray-100 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-600 rounded-md">
-            <h3 className="font-semibold mb-2 text-gray-700 dark:text-zinc-100">
-              Resumo da seleção:
-            </h3>
-            <ul className="text-gray-600 dark:text-zinc-200 list-disc list-inside space-y-1">
-              <li>
-                Tipo:
-                {
-                  {
-                    grouped: " Agrupado",
-                    notGrouped: " Não agrupado",
-                    continuous: " Contínuo",
-                  }[submittedData.type]
-                }
-              </li>
+                {result?.average !== undefined && (
+                  <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                    <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
+                      Média
+                    </p>
+                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                      {!selectedStats.average
+                        ? "N/A"
+                        : result.average.toFixed(2)}
+                    </p>
+                  </div>
+                )}
 
-              <li>
-                Moda:
-                {result?.mode === null || result?.mode === undefined
-                  ? "Moda amodal"
-                  : result.mode?.toFixed(2)}
-              </li>
+                {result?.median !== undefined && (
+                  <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                    <p className="text-md font-medium text-gray-600 dark:text-zinc-300">
+                      Mediana
+                    </p>
+                    <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                      {!selectedStats.median
+                        ? "N/A"
+                        : result.median?.toFixed(2)}
+                    </p>
+                  </div>
+                )}
 
-              {result?.average !== undefined && (
-                <li>Média: {result.average?.toFixed(2)}</li>
-              )}
-
-              {result?.median !== undefined && (
-                <li>Mediana: {result.median?.toFixed(2)}</li>
-              )}
-
-              <li>
-                Desvio Padrão:
-                {result?.standardDeviation === 0
-                  ? "Não possui"
-                  : result?.standardDeviation?.toFixed(2) ?? " N/A"}
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-purple-50 border-1-4 border-blue-400 dark:border-purple-400 rounded shadow-sm">
-            <h2 className="font-semibold text-blue-700 dark:text-purple-700 mb-2">
-              Dicas de interpretação:
-            </h2>
-            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-              <li>A média representa o valor central dos dados.</li>
-              <li>O desvio padrão mostra o quanto os dados variam.</li>
-              <li>Moda é o valor mais frequente - pode haver mais de uma.</li>
-            </ul>
-          </div>
-        )}
-      </form>
+                <div className="bg-gray-100 dark:bg-zinc-700 p-4 rounded-lg shadow flex flex-col items-center gap-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-zinc-300">
+                    Desvio Padrão
+                  </p>
+                  <p className="text-lg font-semibold text-blue-700 dark:text-purple-600">
+                    {!selectedStats.standardDeviation
+                      ? "N/A"
+                      : result?.standardDeviation === 0
+                      ? "Não possui"
+                      : result?.standardDeviation?.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+              <div className="w-full">
+                <ContinuousTableResult />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
