@@ -1,4 +1,4 @@
-import { InputLine } from "../../../components/tables/continuous-table/continuous-table-row";
+import { InputLine } from "../../../components/tables/continuous-table/index";
 import { SelectedStats } from "../types";
 
 export type HandleContinuousSubmitParams = {
